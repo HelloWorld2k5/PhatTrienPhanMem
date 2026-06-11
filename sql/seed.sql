@@ -11,9 +11,9 @@ INSERT INTO cauHinhHeThong (khoaCauHinh, giaTriCauHinh) VALUES
 ON DUPLICATE KEY UPDATE giaTriCauHinh = VALUES(giaTriCauHinh);
 
 -- 2) NGUOI DUNG
+-- Mật khẩu admin là admin123
 INSERT INTO nguoiDung (idNguoiDung, tenDangNhap, matKhauMaHoa, hoTenNguoiDung, vaiTroNguoiDung, trangThaiHoatDong) VALUES
-(1, 'admin', '$2y$10$adminhashdemo', 'Nguyen Van Admin', 'ADMIN', 'ACTIVE'),
-(2, 'staff01', '$2y$10$staffhashdemo', 'Tran Thi Nhan Vien', 'STAFF', 'ACTIVE');
+(1, 'admin', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', 'Nguyen The Truong Admin', 'ADMIN', 'ACTIVE'),
 
 -- 3) BAN
 INSERT INTO banQuanAn (idBan, tenBan, trangThaiBan) VALUES
@@ -50,11 +50,11 @@ INSERT INTO hoaDon (
     tongTienChuaThue, tienThueGiaTriGiaTang, tienGiamGiaKhuyenMai,
     tongTienThucThu, phuongThucThanhToan, soTienKhachDua, tienTraLai
 ) VALUES
-('INV20260610001', 2, 2, 'PAID',
+('INV20260610001', 2, 1, 'PAID',
  130000.00, 10400.00, 5000.00,
  135400.00, 'CASH', 200000.00, 64600.00),
 
-('INV20260610002', 1, 2, 'PAID',
+('INV20260610002', 1, 1, 'PAID',
  76000.00, 6080.00, 0.00,
  82080.00, 'TRANSFER', 82080.00, 0.00);
 

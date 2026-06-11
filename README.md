@@ -19,8 +19,8 @@ coffee-shop-management/
 │           ├── config/
 │           │   ├── AppConfig.java
 │           │   └── DatabaseConnection.java
-│           │
-│           ├── model/
+│           │   model có thêm User.java, CurrentUser.java
+│           ├── model/   
 │           │   ├── MenuItem.java
 │           │   ├── CoffeeItem.java
 │           │   ├── BakeryItem.java
@@ -28,7 +28,7 @@ coffee-shop-management/
 │           │   ├── OrderItem.java
 │           │   ├── Invoice.java
 │           │   └── OrderState.java
-│           │
+│           │   view có thêm LoginFrame.java, RegisterFrame.java
 │           ├── view/
 │           │   ├── MainFrame.java
 │           │   ├── SidebarPanel.java
@@ -36,19 +36,19 @@ coffee-shop-management/
 │           │   ├── CartPanel.java
 │           │   ├── CheckoutDialog.java
 │           │   └── DrinkOptionDialog.java
-│           │
+│           │   controller có thêm AuthController.java
 │           ├── controller/
 │           │   ├── MenuController.java
 │           │   ├── CartController.java
 │           │   ├── CheckoutController.java
 │           │   └── AuthController.java
-│           │
+│           │   service có thêm AuthService.java
 │           ├── service/
 │           │   ├── OrderService.java
 │           │   ├── InvoiceService.java
 │           │   ├── PaymentService.java
 │           │   └── CloneOrderService.java
-│           │
+│           │   repository có thêm AuthRepository.java
 │           ├── repository/
 │           │   ├── MenuRepository.java
 │           │   ├── OrderRepository.java

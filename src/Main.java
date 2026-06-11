@@ -1,20 +1,14 @@
 
 // File Main chạy App
 
-import java.sql.Connection;
-import com.coffeeshop.config.DatabaseConnection;
+import javax.swing.SwingUtilities;
+
+import com.coffeeshop.view.LoginFrame;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        System.out.println("Coffe Shop Management");
-
-        try {
-            Connection conn = DatabaseConnection.getInstance().getConnection();
-            System.out.println("Success");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+        
+        SwingUtilities.invokeLater(() -> new LoginFrame().setVisible(true));
 
     }
 }

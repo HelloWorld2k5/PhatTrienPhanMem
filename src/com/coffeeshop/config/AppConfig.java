@@ -1,5 +1,7 @@
 package com.coffeeshop.config;
 
+import com.coffeeshop.repository.SystemConfigRepository;
+
 public class AppConfig {
     private static AppConfig instance;
 
@@ -12,6 +14,13 @@ public class AppConfig {
     private String databaseUser;
     private String databasePassword;
 
+    // Cấu hình hệ thống từ database
+    private double vatRate = 0.08; // Mặc định 8%
+    private String shopName = "Coffee Shop";
+    private String currency = "VND";
+
+    private SystemConfigRepository configRepository;
+
     private AppConfig() {
         this.appName = "Coffee Shop Management";
         this.appVersion = "1.0.0";
@@ -21,6 +30,9 @@ public class AppConfig {
         this.databaseUser = "root";
         // Nhập mk mysql vào đây
         this.databasePassword = "";
+
+        // Khởi tạo config repository
+        this.configRepository = new SystemConfigRepository();
     }
 
     public static synchronized AppConfig getInstance() {
@@ -28,6 +40,32 @@ public class AppConfig {
             instance = new AppConfig();
         }
         return instance;
+    }
+
+    /**
+     * Load cấu hình từ database
+     * Gọi method này sau khi database được kết nối thành công
+     */
+    public void loadSystemConfig() {
+        try {
+            String vatRateStr = configRepository.getConfigValue("VAT_RATE");
+            if (vatRateStr != null) {
+                this.vatRate = Double.parseDouble(vatRateStr);
+            }
+
+            String shopNameStr = configRepository.getConfigValue("TEN_QUAN");
+            if (shopNameStr != null) {
+                this.shopName = shopNameStr;
+            }
+
+            String currencyStr = configRepository.getConfigValue("CURRENCY");
+            if (currencyStr != null) {
+                this.currency = currencyStr;
+            }
+        } catch (Exception e) {
+            System.err.println("Lỗi khi load cấu hình hệ thống: " + e.getMessage());
+            // Sử dụng giá trị mặc định nếu có lỗi
+        }
     }
 
     public String getAppName() {
@@ -81,5 +119,29 @@ public class AppConfig {
     public String getJdbcUrl() {
         return "jdbc:mysql://" + databaseHost + ":" + databasePort + "/" + databaseName
                 + "?useSSL=false&serverTimezone=Asia/Bangkok&allowPublicKeyRetrieval=true";
+    }
+
+    public double getVatRate() {
+        return vatRate;
+    }
+
+    public void setVatRate(double vatRate) {
+        this.vatRate = vatRate;
+    }
+
+    public String getShopName() {
+        return shopName;
+    }
+
+    public void setShopName(String shopName) {
+        this.shopName = shopName;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
     }
 }
