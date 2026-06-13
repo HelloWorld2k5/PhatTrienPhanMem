@@ -1,3 +1,4 @@
+import com.coffeeshop.util.PasswordUtil;
 import com.coffeeshop.view.LoginFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;

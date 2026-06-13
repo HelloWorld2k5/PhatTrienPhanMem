@@ -2,6 +2,7 @@ package com.coffeeshop.observer;
 
 import com.coffeeshop.model.MenuItem;
 import com.coffeeshop.model.TableItem;
+import com.coffeeshop.util.StatusUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,6 +24,18 @@ public class CartSubject implements Subject {
             this.item = item;
             this.quantity = quantity;
             this.note = note;
+        }
+
+        // Prototype Constructor
+        public OrderItem(OrderItem other) {
+            this.item = other.item.clone(); // ứng dụng prototype
+            this.quantity = other.quantity;
+            this.note = other.note;
+        }
+
+        // Ứng dụng prototype
+        public OrderItem deepCopy() {
+            return new OrderItem(this);
         }
 
         public MenuItem getItem() {
@@ -91,11 +104,11 @@ public class CartSubject implements Subject {
 
             if (hasOrder(table.getId())) {
 
-                table.setStatus("BUSY");
+                table.setStatus(StatusUtil.TABLE_BUSY);
 
             } else {
 
-                table.setStatus("FREE");
+                table.setStatus(StatusUtil.TABLE_FREE);
             }
         }
     }
@@ -107,7 +120,7 @@ public class CartSubject implements Subject {
 
     public void undo() {
         if (!undoStack.isEmpty()) {
-            redoStack.push(deepCopy(tableCarts));
+            redoStack.push(deepCopy(tableCarts)); // dùng prototype
             tableCarts = undoStack.pop();
             notifyObservers();
         }
@@ -115,12 +128,13 @@ public class CartSubject implements Subject {
 
     public void redo() {
         if (!redoStack.isEmpty()) {
-            undoStack.push(deepCopy(tableCarts));
+            undoStack.push(deepCopy(tableCarts)); // dùng prototype
             tableCarts = redoStack.pop();
             notifyObservers();
         }
     }
 
+    // Ứng dụng prototype
     private Map<Integer, List<OrderItem>> deepCopy(
             Map<Integer, List<OrderItem>> source) {
 
@@ -131,11 +145,7 @@ public class CartSubject implements Subject {
             List<OrderItem> newList = new ArrayList<>();
 
             for (OrderItem item : source.get(key)) {
-                newList.add(
-                        new OrderItem(
-                                item.getItem(),
-                                item.getQuantity(),
-                                item.getNote()));
+                newList.add(item.deepCopy()); // prototype
             }
 
             copy.put(key, newList);
@@ -218,7 +228,7 @@ public class CartSubject implements Subject {
         List<OrderItem> newItems = new ArrayList<>();
         for (OrderItem oi : currentItems) {
             // Tạo một OrderItem mới dựa trên thông tin cũ
-            newItems.add(new OrderItem(oi.getItem(), oi.getQuantity(), oi.getNote()));
+            newItems.add(oi.deepCopy()); // ứng dụng prototype
         }
 
         tableCarts.put(targetTableId, newItems);

@@ -17,5 +17,6 @@ public interface MenuItem {
     void setDescription(String description);
     void setIcon(String icon);
     void setStatus(String status);
+    
     MenuItem clone();
 }

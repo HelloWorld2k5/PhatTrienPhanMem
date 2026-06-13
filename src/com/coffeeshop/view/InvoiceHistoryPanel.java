@@ -102,7 +102,7 @@ public class InvoiceHistoryPanel extends JPanel {
 
                     if (fullInvoice != null) {
                         InvoiceDetailDialog dialog = new InvoiceDetailDialog(
-                                (JFrame) SwingUtilities.getWindowAncestor(table), fullInvoice);
+                                (JFrame) SwingUtilities.getWindowAncestor(table), fullInvoice.deepCopy());
                         dialog.setVisible(true);
                     } else {
                         JOptionPane.showMessageDialog(null, "Không tìm thấy chi tiết hóa đơn!");

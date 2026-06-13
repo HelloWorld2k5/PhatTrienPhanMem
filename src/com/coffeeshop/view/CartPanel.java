@@ -314,6 +314,7 @@ public class CartPanel extends JPanel implements Observer {
             if (StatusUtil.isTableFree(table.getStatus()) && table.getId() != currentTable.getId()) {
                 JMenuItem item = new JMenuItem("Sao chép sang: " + table.getName());
                 item.addActionListener(e -> {
+                    // Ứng dụng phương thức deepCopy
                     boolean success = cartSubject.copyOrderToTable(table.getId());
                     if (success) {
                         table.setStatus(StatusUtil.TABLE_BUSY);
@@ -408,7 +409,7 @@ public class CartPanel extends JPanel implements Observer {
     }
 
     private Invoice createInvoiceFromCart() {
-        Invoice invoice = new Invoice();
+        Invoice invoice = new Invoice(InvoiceIdGenerator.generate());
         List<InvoiceItem> items = new ArrayList<>();
         double subtotal = 0;
 
@@ -433,7 +434,6 @@ public class CartPanel extends JPanel implements Observer {
 
         invoice.setItems(items);
         invoice.setSubtotal(subtotal);
-        invoice.setInvoiceId(InvoiceIdGenerator.generate());
         invoice.setUserId(CurrentUser.getInstance().getUser().getUserId());
         invoice.setTableId(cartSubject.getCurrentTableId());
         invoice.setCreatedAt(DateTimeUtil.now());

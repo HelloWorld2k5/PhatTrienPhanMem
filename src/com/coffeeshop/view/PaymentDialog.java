@@ -17,14 +17,13 @@ public class PaymentDialog extends JDialog {
     private final JTextField txtCashIn = new JTextField(15);
     private final JTextField txtChange = new JTextField(15);
 
-    // THAY ĐỔI 1: thêm các label hiển thị tổng tiền rõ ràng
     private final JLabel lblSubtotal = new JLabel();
     private final JLabel lblVat = new JLabel();
     private final JLabel lblDiscount = new JLabel();
     private final JLabel lblGrandTotal = new JLabel();
 
-    // THAY ĐỔI 2: dùng enum thay vì nhập chuỗi
     private final JComboBox<PaymentMethod> cboPaymentMethod = new JComboBox<>(PaymentMethod.values());
+
     private final JComboBox<String> cboPrintFormat = new JComboBox<>(new String[] { "TXT", "EXCEL" });
 
     private final PaymentService paymentService = new PaymentService();
@@ -40,91 +39,15 @@ public class PaymentDialog extends JDialog {
         super(parent, "Chi tiết thanh toán", true);
         this.invoice = invoice;
 
-        // invoice.setInvoiceId(InvoiceIdGenerator.generate());
-
-        setSize(700, 500);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setSize(760, 560);
         setLocationRelativeTo(parent);
-        setLayout(new BorderLayout(10, 10));
+        setLayout(new BorderLayout(12, 12));
 
-        // ===== TOP =====
-        JPanel topPanel = new JPanel(new GridLayout(4, 2, 8, 8));
-        topPanel.setBorder(BorderFactory.createTitledBorder("Thông tin hóa đơn"));
+        add(buildInvoiceInfoPanel(), BorderLayout.NORTH);
+        add(buildCenterPanel(), BorderLayout.CENTER);
+        add(buildBottomPanel(), BorderLayout.SOUTH);
 
-        topPanel.add(new JLabel("Tạm tính:"));
-        lblSubtotal.setText(MoneyUtil.format(invoice.getSubtotal()));
-        topPanel.add(lblSubtotal);
-
-        topPanel.add(new JLabel("VAT:"));
-        lblVat.setText(MoneyUtil.format(invoice.getVatAmount()));
-        topPanel.add(lblVat);
-
-        topPanel.add(new JLabel("Giảm giá:"));
-        lblDiscount.setText(MoneyUtil.format(invoice.getDiscountAmount()));
-        topPanel.add(lblDiscount);
-
-        topPanel.add(new JLabel("Tổng thanh toán:"));
-        lblGrandTotal.setText(MoneyUtil.format(invoice.getTotalAmount()));
-        topPanel.add(lblGrandTotal);
-
-        add(topPanel, BorderLayout.NORTH);
-
-        // ===== CENTER =====
-        JPanel centerPanel = new JPanel(new GridLayout(3, 2, 8, 8));
-        centerPanel.setBorder(BorderFactory.createTitledBorder("Thanh toán"));
-
-        centerPanel.add(new JLabel("Phương thức thanh toán:"));
-        centerPanel.add(cboPaymentMethod);
-
-        centerPanel.add(new JLabel("Tiền khách đưa:"));
-        centerPanel.add(txtCashIn);
-
-        centerPanel.add(new JLabel("Tiền trả lại:"));
-        txtChange.setEditable(false);
-        centerPanel.add(txtChange);
-
-        centerPanel.add(new JLabel("Định dạng in:"));
-        centerPanel.add(cboPrintFormat);
-
-        add(centerPanel, BorderLayout.CENTER);
-
-        // ===== QUICK MONEY BUTTONS =====
-        JPanel quickPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 8));
-        quickPanel.setBorder(BorderFactory.createTitledBorder("Mệnh giá nhanh"));
-
-        JButton btn50k = new JButton("50.000 đ");
-        btn50k.addActionListener(e -> txtCashIn.setText("50000"));
-
-        JButton btn100k = new JButton("100.000 đ");
-        btn100k.addActionListener(e -> txtCashIn.setText("100000"));
-
-        JButton btn200k = new JButton("200.000 đ");
-        btn200k.addActionListener(e -> txtCashIn.setText("200000"));
-
-        JButton btn500k = new JButton("500.000 đ");
-        btn500k.addActionListener(e -> txtCashIn.setText("500000"));
-
-        quickPanel.add(btn50k);
-        quickPanel.add(btn100k);
-        quickPanel.add(btn200k);
-        quickPanel.add(btn500k);
-
-        add(quickPanel, BorderLayout.WEST);
-
-        // ===== BOTTOM =====
-        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 8));
-
-        JButton btnPreview = new JButton("Xác nhận & In hóa đơn");
-        btnPreview.addActionListener(e -> proceedToPreview());
-
-        JButton btnCancel = new JButton("Hủy");
-        btnCancel.addActionListener(e -> dispose());
-
-        bottomPanel.add(btnCancel);
-        bottomPanel.add(btnPreview);
-
-        add(bottomPanel, BorderLayout.SOUTH);
-
-        // THAY ĐỔI 3: tự động tính tiền thối
         txtCashIn.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -145,58 +68,166 @@ public class PaymentDialog extends JDialog {
         updateChange();
     }
 
+    private JPanel buildInvoiceInfoPanel() {
+        JPanel panel = new JPanel(new GridLayout(4, 2, 8, 8));
+        panel.setBorder(BorderFactory.createTitledBorder("Thông tin hóa đơn"));
+        panel.setBackground(Color.WHITE);
+
+        JLabel lb1 = new JLabel("Tạm tính:");
+        JLabel lb2 = new JLabel("VAT:");
+        JLabel lb3 = new JLabel("Giảm giá:");
+        JLabel lb4 = new JLabel("Tổng thanh toán:");
+
+        Font boldFont = new Font("Arial", Font.BOLD, 13);
+        Font totalFont = new Font("Arial", Font.BOLD, 15);
+
+        lb1.setFont(boldFont);
+        lb2.setFont(boldFont);
+        lb3.setFont(boldFont);
+        lb4.setFont(totalFont);
+
+        lblSubtotal.setText(MoneyUtil.format(invoice.getSubtotal()));
+        lblVat.setText(MoneyUtil.format(invoice.getVatAmount()));
+        lblDiscount.setText(MoneyUtil.format(invoice.getDiscountAmount()));
+        lblGrandTotal.setText(MoneyUtil.format(invoice.getTotalAmount()));
+
+        lblGrandTotal.setFont(totalFont);
+
+        panel.add(lb1);
+        panel.add(lblSubtotal);
+        panel.add(lb2);
+        panel.add(lblVat);
+        panel.add(lb3);
+        panel.add(lblDiscount);
+        panel.add(lb4);
+        panel.add(lblGrandTotal);
+
+        return panel;
+    }
+
+    private JPanel buildCenterPanel() {
+        JPanel wrapper = new JPanel(new BorderLayout(10, 10));
+        wrapper.setBackground(new Color(245, 246, 247));
+
+        JPanel paymentPanel = new JPanel(new GridBagLayout());
+        paymentPanel.setBorder(BorderFactory.createTitledBorder("Thanh toán"));
+        paymentPanel.setBackground(Color.WHITE);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(8, 8, 8, 8);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        txtCashIn.setColumns(14);
+        txtChange.setColumns(14);
+        txtChange.setEditable(false);
+        txtChange.setFocusable(false);
+
+        int y = 0;
+
+        addFormRow(paymentPanel, gbc, y++, "Phương thức thanh toán:", cboPaymentMethod);
+        addFormRow(paymentPanel, gbc, y++, "Tiền khách đưa:", txtCashIn);
+        addFormRow(paymentPanel, gbc, y++, "Tiền trả lại:", txtChange);
+        addFormRow(paymentPanel, gbc, y++, "Định dạng in:", cboPrintFormat);
+
+        JPanel quickPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 8));
+        quickPanel.setBorder(BorderFactory.createTitledBorder("Mệnh giá nhanh"));
+        quickPanel.setBackground(Color.WHITE);
+
+        JButton btn50k = new JButton("50.000 đ");
+        btn50k.addActionListener(e -> txtCashIn.setText("50000"));
+
+        JButton btn100k = new JButton("100.000 đ");
+        btn100k.addActionListener(e -> txtCashIn.setText("100000"));
+
+        JButton btn200k = new JButton("200.000 đ");
+        btn200k.addActionListener(e -> txtCashIn.setText("200000"));
+
+        JButton btn500k = new JButton("500.000 đ");
+        btn500k.addActionListener(e -> txtCashIn.setText("500000"));
+
+        for (JButton btn : new JButton[] { btn50k, btn100k, btn200k, btn500k }) {
+            btn.setFocusPainted(false);
+            quickPanel.add(btn);
+        }
+
+        wrapper.add(paymentPanel, BorderLayout.CENTER);
+        wrapper.add(quickPanel, BorderLayout.SOUTH);
+
+        return wrapper;
+    }
+
+    private void addFormRow(JPanel panel, GridBagConstraints gbc, int y, String labelText, JComponent field) {
+        JLabel label = new JLabel(labelText);
+        label.setFont(new Font("Arial", Font.BOLD, 12));
+
+        gbc.gridx = 0;
+        gbc.gridy = y;
+        gbc.weightx = 0;
+        panel.add(label, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = y;
+        gbc.weightx = 1;
+        panel.add(field, gbc);
+    }
+
+    private JPanel buildBottomPanel() {
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 8));
+        panel.setBorder(BorderFactory.createEmptyBorder(0, 0, 4, 0));
+        panel.setBackground(new Color(245, 246, 247));
+
+        JButton btnCancel = new JButton("Hủy");
+        btnCancel.setFocusPainted(false);
+        btnCancel.addActionListener(e -> dispose());
+
+        JButton btnPreview = new JButton("Xác nhận & In hóa đơn");
+        btnPreview.setFocusPainted(false);
+        btnPreview.setBackground(new Color(184, 115, 51));
+        btnPreview.setForeground(Color.BLACK);
+        btnPreview.addActionListener(e -> proceedToPreview());
+
+        panel.add(btnCancel);
+        panel.add(btnPreview);
+
+        return panel;
+    }
+
     private InvoicePrinter getSelectedPrinter() {
         String format = (String) cboPrintFormat.getSelectedItem();
-
         if ("EXCEL".equalsIgnoreCase(format)) {
             return new ExcelInvoiceAdapter();
         }
-
         return new TxtInvoiceAdapter();
     }
 
-    // THAY ĐỔI 4: tính tiền thối, báo chưa đủ tiền nếu âm
     private void updateChange() {
         try {
-
-            if (txtCashIn.getText().trim().isEmpty()) {
+            String text = txtCashIn.getText().trim();
+            if (text.isEmpty()) {
                 txtChange.setText("");
                 return;
             }
 
-            double cashIn = Double.parseDouble(txtCashIn.getText().trim());
-
+            double cashIn = Double.parseDouble(text);
             double total = invoice.getTotalAmount();
-
             double change = cashIn - total;
 
             if (change < 0) {
-
-                txtChange.setText(
-                        "Thiếu "
-                                + MoneyUtil.format(Math.abs(change)));
-
+                txtChange.setText("Thiếu " + MoneyUtil.format(Math.abs(change)));
             } else {
-
-                txtChange.setText(
-                        MoneyUtil.format(change));
+                txtChange.setText(MoneyUtil.format(change));
             }
-
         } catch (NumberFormatException ex) {
-
             txtChange.setText("Không hợp lệ");
         }
     }
 
-    // THAY ĐỔI 5: xử lý thanh toán hoàn chỉnh
     private void proceedToPreview() {
         try {
             double cashIn = Double.parseDouble(txtCashIn.getText().trim());
 
             if (cashIn < invoice.getTotalAmount()) {
-                JOptionPane.showMessageDialog(
-                        this,
-                        "Khách đưa chưa đủ tiền!");
+                JOptionPane.showMessageDialog(this, "Khách đưa chưa đủ tiền!");
                 return;
             }
 
@@ -207,28 +238,22 @@ public class PaymentDialog extends JDialog {
             }
 
             invoice.setPaymentMethod(method);
-
-            // Tính lại invoice theo logic service
             invoice.setAmountPaid(cashIn);
+            invoice.setChangeAmount(cashIn - invoice.getTotalAmount());
 
-            invoice.setChangeAmount(
-                    cashIn - invoice.getTotalAmount());
-
-            // Lưu DB trước
             boolean saved = paymentService.saveInvoice(invoice);
             if (!saved) {
                 JOptionPane.showMessageDialog(this, "Không thể lưu hóa đơn!");
                 return;
             }
 
-            // Xuất file TXT
             InvoicePrinter printer = getSelectedPrinter();
-
             String format = (String) cboPrintFormat.getSelectedItem();
             String extension = "EXCEL".equalsIgnoreCase(format) ? ".xlsx" : ".txt";
-
             String fileName = "HoaDon_" + invoice.getInvoiceId() + extension;
-            printer.print(invoice, fileName);
+
+            Invoice clonedInvoice = invoice.deepCopy();
+            printer.print(clonedInvoice, fileName);
 
             paymentSuccessful = true;
 
