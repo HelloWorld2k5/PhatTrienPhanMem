@@ -1,16 +1,15 @@
 package com.coffeeshop.view;
 
-import com.coffeeshop.model.BakeryItem;
-import com.coffeeshop.model.CoffeeCombo;
-import com.coffeeshop.model.CoffeeItem;
+import com.coffeeshop.factory.AbstractMenuItemFactory;
+import com.coffeeshop.factory.MenuItemFactoryRegistry;
 import com.coffeeshop.model.MenuItem;
 import com.coffeeshop.observer.CartSubject;
 import com.coffeeshop.repository.MenuRepository;
 import com.coffeeshop.util.MoneyUtil;
 import com.coffeeshop.util.StatusUtil;
-
 import java.awt.*;
 import java.util.List;
+import java.util.Map;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
@@ -21,7 +20,7 @@ public class MenuPanel extends JPanel {
 
     private JTextField txtSearch;
     private JButton btnSearch;
-    private JRadioButton rdoAll, rdoCoffee, rdoBakery, rdoCombo;
+    private JRadioButton rdoAll, rdoCoffee, rdoBakery, rdoCombo,rdoCoffeeMachine,rdoCoffeeTrad;
     private ButtonGroup filterGroup;
     private JButton btnAddNewItem;
 
@@ -35,6 +34,13 @@ public class MenuPanel extends JPanel {
     private final Color COLOR_LATTE_LIGHT = new Color(0x96, 0x79, 0x69); // Nâu Latte nhẹ cho nhãn phụ
     private final Color COLOR_WARM_COPPER = new Color(0xB8, 0x73, 0x33); // Đồng ấm sáng cho nút hành động chính
 
+    private final Map<String, List<String>> filterMap = Map.of(
+        "ALL", List.of("COFFEE_MACHINE", "COFFEE_TRADITIONAL", "BAKERY", "COMBO"),
+        "COFFEE_MACHINE", List.of("COFFEE_MACHINE"),
+        "COFFEE_TRADITIONAL", List.of("COFFEE_TRADITIONAL"),
+        "BAKERY", List.of("BAKERY"),
+        "COMBO", List.of("COMBO")
+    );
     public MenuPanel(CartSubject cartSubject) {
         this.cartSubject = cartSubject;
         initUI();
@@ -116,14 +122,19 @@ public class MenuPanel extends JPanel {
         titledBorder.setTitleColor(COLOR_COFFEE_BROWN);
         pnlRadioFilters.setBorder(titledBorder);
 
-        rdoAll = new JRadioButton("Tất cả các món", true);
-        rdoCoffee = new JRadioButton("Hương vị Cà phê");
-        rdoBakery = new JRadioButton("Bánh bông & Bánh kẹp");
-        rdoCombo = new JRadioButton("Combo tiết kiệm");
+        // rdoAll = new JRadioButton("Tất cả các món", true);
+        // rdoCoffee = new JRadioButton("Hương vị Cà phê");
+        // rdoBakery = new JRadioButton("Bánh bông & Bánh kẹp");
+        // rdoCombo = new JRadioButton("Combo tiết kiệm");
+        rdoAll = new JRadioButton("Tất cả", true);
+        rdoCoffeeMachine = new JRadioButton("Cà phê máy");
+        rdoCoffeeTrad = new JRadioButton("Cà phê truyền thống");
+        rdoBakery = new JRadioButton("Bánh ngọt");
+        rdoCombo = new JRadioButton("Combo");
 
         // Đồng bộ Font chữ & Màu sắc cho các nút Radio để đạt tương phản cao
         Font radioFont = new Font("Arial", Font.BOLD, 12);
-        for (JRadioButton rdo : new JRadioButton[] { rdoAll, rdoCoffee, rdoBakery, rdoCombo }) {
+        for (JRadioButton rdo : new JRadioButton[] { rdoAll, rdoCoffeeMachine,rdoCoffeeTrad, rdoBakery, rdoCombo }) {
             rdo.setFont(radioFont);
             rdo.setBackground(COLOR_WARM_CREAM);
             rdo.setForeground(COLOR_ESPRESSO_TEXT);
@@ -132,12 +143,14 @@ public class MenuPanel extends JPanel {
 
         filterGroup = new ButtonGroup();
         filterGroup.add(rdoAll);
-        filterGroup.add(rdoCoffee);
+        filterGroup.add(rdoCoffeeMachine);
+        filterGroup.add(rdoCoffeeTrad);
         filterGroup.add(rdoBakery);
         filterGroup.add(rdoCombo);
 
         pnlRadioFilters.add(rdoAll);
-        pnlRadioFilters.add(rdoCoffee);
+        pnlRadioFilters.add(rdoCoffeeMachine);
+        pnlRadioFilters.add(rdoCoffeeTrad);
         pnlRadioFilters.add(rdoBakery);
         pnlRadioFilters.add(rdoCombo);
 
@@ -173,23 +186,11 @@ public class MenuPanel extends JPanel {
         // =========================================================================
         // 3. ĐĂNG KÝ LISTENERS ĐIỀU KHIỂN BỘ LỌC
         // =========================================================================
-        rdoAll.addActionListener(e -> {
-            currentCategoryFilter = "ALL";
-            loadMenu();
-        });
-        rdoCoffee.addActionListener(e -> {
-            currentCategoryFilter = "COFFEE";
-            loadMenu();
-        });
-        rdoBakery.addActionListener(e -> {
-            currentCategoryFilter = "BAKERY";
-            loadMenu();
-        });
-        rdoCombo.addActionListener(e -> {
-            currentCategoryFilter = "COMBO";
-            loadMenu();
-        });
-
+        rdoAll.addActionListener(e -> { currentCategoryFilter = "ALL"; loadMenu(); });
+        rdoCoffeeMachine.addActionListener(e -> { currentCategoryFilter = "COFFEE_MACHINE"; loadMenu(); });
+        rdoCoffeeTrad.addActionListener(e -> { currentCategoryFilter = "COFFEE_TRADITIONAL"; loadMenu(); });
+        rdoBakery.addActionListener(e -> { currentCategoryFilter = "BAKERY"; loadMenu(); });
+        rdoCombo.addActionListener(e -> { currentCategoryFilter = "COMBO"; loadMenu(); });
         btnSearch.addActionListener(e -> loadMenu());
         txtSearch.addActionListener(e -> loadMenu());
         btnAddNewItem.addActionListener(e -> openAddNewItemDialog());
@@ -203,7 +204,7 @@ public class MenuPanel extends JPanel {
 
         for (MenuItem item : items) {
             if (item == null || !StatusUtil.isItemAvailable(item.getStatus())) {
-                continue;
+                // continue;
             }
 
             if (!searchKeyword.isEmpty() && !item.getName().toLowerCase().contains(searchKeyword)) {
@@ -212,16 +213,9 @@ public class MenuPanel extends JPanel {
 
             String category = item.getCategory() != null ? item.getCategory().toUpperCase() : "";
             if (!"ALL".equals(currentCategoryFilter)) {
-                if ("COFFEE".equals(currentCategoryFilter)) {
-                    if (!category.contains("COFFEE_MACHINE") && !category.contains("COFFEE_TRADITIONAL")) {
-                        continue;
-                    }
-                } else if ("BAKERY".equals(currentCategoryFilter)) {
-                    if (!"BAKERY".equals(category))
-                        continue;
-                } else if ("COMBO".equals(currentCategoryFilter)) {
-                    if (!"COMBO".equals(category))
-                        continue;
+                List<String> validCategories = filterMap.get(currentCategoryFilter);
+                if (validCategories == null || !validCategories.contains(category)) {
+                    continue;
                 }
             }
 
@@ -473,20 +467,14 @@ public class MenuPanel extends JPanel {
                 String icon = txtIcon.getText().trim().isEmpty() ? "☕" : txtIcon.getText().trim();
                 String desc = txtDesc.getText().trim();
                 String status = "AVAILABLE";
-
-                MenuItem newItem;
-                if ("BAKERY".equals(category)) {
-                    newItem = new BakeryItem(0, name, category, basePrice, desc, icon, status);
-                } else if ("COMBO".equals(category)) {
-                    newItem = new CoffeeCombo(0, name, category, basePrice, desc, icon, status);
-                } else {
-                    newItem = new CoffeeItem(0, name, category, basePrice, desc, icon, status);
+                AbstractMenuItemFactory factory = MenuItemFactoryRegistry.getFactory(category);
+            if (factory != null) {
+                MenuItem newItem = factory.createMenuItem(0, name, category, basePrice, desc, icon, status);
+            if (menuRepository.insertNewMenuItem(newItem)) {
+                dialog.dispose();
+                loadMenu();
                 }
-
-                if (menuRepository.insertNewMenuItem(newItem)) {
-                    dialog.dispose();
-                    loadMenu();
-                }
+            }
             } catch (NumberFormatException ex) {
             }
         });

@@ -1,7 +1,8 @@
 package com.coffeeshop.repository;
 
 import com.coffeeshop.config.DatabaseConnection;
-import com.coffeeshop.factory.CoffeeFactory;
+import com.coffeeshop.factory.AbstractMenuItemFactory;
+import com.coffeeshop.factory.MenuItemFactoryRegistry;
 import com.coffeeshop.model.MenuItem;
 import java.sql.*;
 import java.util.ArrayList;
@@ -10,34 +11,40 @@ import java.util.List;
 public class MenuRepository {
 
     public List<MenuItem> getAllMenuItems() {
-        List<MenuItem> menu = new ArrayList<>();
-        String sql = "SELECT idMonAn, tenMonAn, danhMucMonAn, giaMonAnCoBan, moTaMonAn, bieuTuongMonAn, trangThaiMonAn FROM monAn WHERE trangThaiMonAn = 'AVAILABLE'";
+    List<MenuItem> menu = new ArrayList<>();
+    String sql = "SELECT idMonAn, tenMonAn, danhMucMonAn, giaMonAnCoBan, moTaMonAn, bieuTuongMonAn, trangThaiMonAn FROM monAn";
 
-        try (Connection conn = DatabaseConnection.getInstance().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-            
-            while (rs.next()) {
-                try {
-                    MenuItem item = CoffeeFactory.createMenuItem(
+    try (Connection conn = DatabaseConnection.getInstance().getConnection();
+         PreparedStatement stmt = conn.prepareStatement(sql);
+         ResultSet rs = stmt.executeQuery()) {
+        
+        while (rs.next()) {
+            try {
+                String category = rs.getString("danhMucMonAn");
+                // Lấy Factory tương ứng từ Registry
+                AbstractMenuItemFactory factory = MenuItemFactoryRegistry.getFactory(category);
+                
+                if (factory != null) {
+                    MenuItem item = factory.createMenuItem(
                         rs.getInt("idMonAn"),
                         rs.getString("tenMonAn"),
-                        rs.getString("danhMucMonAn"),
+                        category,
                         rs.getDouble("giaMonAnCoBan"),
                         rs.getString("moTaMonAn"),
                         rs.getString("bieuTuongMonAn"),
                         rs.getString("trangThaiMonAn")
                     );
-                    if (item != null) menu.add(item);
-                } catch (Exception e) {
-                    System.err.println("Lỗi khi khởi tạo item: " + rs.getInt("idMonAn"));
+                    menu.add(item);
                 }
+            } catch (Exception e) {
+                System.err.println("Lỗi khi khởi tạo item ID: " + rs.getInt("idMonAn"));
             }
-        } catch (SQLException e) {
-            System.err.println("Lỗi kết nối DB: " + e.getMessage());
         }
-        return menu;
+    } catch (SQLException e) {
+        System.err.println("Lỗi kết nối DB: " + e.getMessage());
     }
+    return menu;
+}
 
     /**
      * Thêm mới một món ăn vào bảng monAn trong Database

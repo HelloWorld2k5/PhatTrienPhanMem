@@ -9,12 +9,11 @@ public class CoffeeCombo implements MenuItem {
     private String icon;
     private String status;
 
-    public CoffeeCombo(int id, String name, String category, double basePrice, 
-                       String description, String icon, String status) {
+    public CoffeeCombo(int id, String name, String category, double price, String description, String icon, String status) {
         this.id = id;
         this.name = name;
         this.category = category;
-        this.basePrice = basePrice;
+        this.basePrice = price;
         this.description = description;
         this.icon = icon;
         this.status = status;

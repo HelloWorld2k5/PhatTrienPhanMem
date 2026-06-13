@@ -1,0 +1,15 @@
+HOA DON BAN HANG
+Ma HD: INV20260614023359
+Ma ban: 1
+Ma nhan vien: 2
+Phuong thuc: CASH
+Thoi gian: 2026-06-14T02:33:59.707897200
+----------------------------------------
+Banh croissant + Sữa Hạnh Nhân x1 = 37.000 ₫
+----------------------------------------
+Tong truoc thue: 37.000 ₫
+VAT: 2.960 ₫
+Giam gia: 0 ₫
+Thanh tien: 39.960 ₫
+Tien khach dua: 50.000 ₫
+Tien tra lai: 10.040 ₫

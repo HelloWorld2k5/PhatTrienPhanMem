@@ -29,7 +29,7 @@ public class AppConfig {
         this.databaseName = "quanLyCaPheDb";
         this.databaseUser = "root";
         // Nhập mk mysql vào đây
-        this.databasePassword = "TruongSQL2k5@#$";
+        this.databasePassword = "thuandeptrai1601@";
 
         // Khởi tạo config repository
         this.configRepository = new SystemConfigRepository();

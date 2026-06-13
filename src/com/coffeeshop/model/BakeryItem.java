@@ -9,24 +9,24 @@ public class BakeryItem implements MenuItem {
     private String icon;
     private String status;
 
-    public BakeryItem(int id, String name, String category, double basePrice, String description, String icon, String status) {
+    public BakeryItem(int id, String name, String category,double price,String description, String icon, String status) {
         this.id = id;
         this.name = name;
         this.category = category;
-        this.basePrice = basePrice;
+        this.basePrice = price;
         this.description = description;
         this.icon = icon;
         this.status = status;
     }
 
     public BakeryItem(BakeryItem other) {
-        id = other.getId();
-        name = other.getName();
-        category = other.getCategory();
-        basePrice = other.getBasePrice();
-        description = other.getDescription();
-        icon = other.getIcon();
-        status = other.getStatus(); 
+        this.id = other.getId();
+        this.name = other.getName();
+        this.category = other.getCategory();
+        this.basePrice = other.getBasePrice();
+        this.description = other.getDescription();
+        this.icon = other.getIcon();
+        this.status = other.getStatus();
     }
 
     @Override public int getId() { return id; }

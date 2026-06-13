@@ -2,6 +2,7 @@
 package com.coffeeshop.model;
 
 public interface MenuItem {
+
     int getId();                // idMonAn
     String getName();           // tenMonAn
     String getCategory();       // danhMucMonAn
@@ -20,3 +21,4 @@ public interface MenuItem {
     
     MenuItem clone();
 }
+
